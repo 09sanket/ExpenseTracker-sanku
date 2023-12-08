@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
-const db = require('./database');
+const db = require('../database'); // Use ../ to go up one level to the root folder
+
 
 // Body parser middleware to handle form data
 app.use(express.urlencoded({ extended: false }));

@@ -1,14 +1,11 @@
-// login.js
+const bcrypt = require('bcrypt');
 
-const express = require('express');
-const router = express.Router();
-const db = require('../database'); // Use ../ to go up one level to the root folder
-
+// ...
 
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
-  db.query('SELECT * FROM users WHERE email = ?', [email], (error, results) => {
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (error, results) => {
     if (error) {
       console.error('Error retrieving user:', error);
       res.status(500).send('Internal server error');
@@ -18,14 +15,19 @@ router.post('/login', (req, res) => {
       } else {
         const user = results[0];
 
-        if (user.password === password) {
-          res.status(200).send('User login successful');
-        } else {
-          res.status(401).send('User not authorized');
+        try {
+          const passwordMatch = await bcrypt.compare(password, user.password);
+
+          if (passwordMatch) {
+            res.status(200).send('User login successful');
+          } else {
+            res.status(401).send('User not authorized');
+          }
+        } catch (error) {
+          console.error('Error during password comparison:', error);
+          res.status(500).send('Internal server error');
         }
       }
     }
   });
 });
-
-module.exports = router;

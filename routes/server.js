@@ -1,31 +1,26 @@
-const express = require('express');
-const app = express();
-const db = require('../database'); // Use ../ to go up one level to the root folder
+const bcrypt = require('bcrypt');
+const saltRounds = 10; // Number of salt rounds for bcrypt hashing
 
-
-// Body parser middleware to handle form data
-app.use(express.urlencoded({ extended: false }));
-
-// Serve static files (like HTML, CSS)
-app.use(express.static('public'));
-
-
-
-
+// ...
 
 // Handle form submission
-app.post('/signup', (req, res) => {
+app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
 
-  const INSERT_USER_QUERY = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-  db.query(INSERT_USER_QUERY, [username, email, password], (err, result) => {
-    if (err) {
-      res.status(500).send('Error inserting user');
-    } else {
-      res.status(200).send('User inserted successfully');
-    }
-  });
+    const INSERT_USER_QUERY = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
+
+    db.query(INSERT_USER_QUERY, [username, email, hashedPassword], (err, result) => {
+      if (err) {
+        res.status(500).send('Error inserting user');
+      } else {
+        res.status(200).send('User inserted successfully');
+      }
+    });
+  } catch (error) {
+    console.error('Error during signup:', error);
+    res.status(500).send('Internal server error');
+  }
 });
-
-module.exports = app;

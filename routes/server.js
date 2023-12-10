@@ -16,7 +16,8 @@ app.post('/signup', async (req, res) => {
       if (err) {
         res.status(500).send('Error inserting user');
       } else {
-        res.status(200).send('User inserted successfully');
+        // Redirect to login.html after successful signup
+        res.redirect('/login.html');
       }
     });
   } catch (error) {

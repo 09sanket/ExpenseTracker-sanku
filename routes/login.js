@@ -1,7 +1,12 @@
 const bcrypt = require('bcrypt');
 
-// ...
+// ... (other required imports and configurations)
 
+// Assuming you're using Express router
+const express = require('express');
+const router = express.Router();
+
+// Existing login route
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -19,7 +24,8 @@ router.post('/login', (req, res) => {
           const passwordMatch = await bcrypt.compare(password, user.password);
 
           if (passwordMatch) {
-            res.status(200).send('User login successful');
+            // Redirect to expense.html after successful login
+            res.redirect('/expense.html');
           } else {
             res.status(401).send('User not authorized');
           }
@@ -31,3 +37,6 @@ router.post('/login', (req, res) => {
     }
   });
 });
+
+// Export the router to be used in the main server file
+module.exports = router;
